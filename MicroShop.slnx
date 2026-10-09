@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Folder Name="/Itens de Solução/">
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Src/" />
+</Solution>

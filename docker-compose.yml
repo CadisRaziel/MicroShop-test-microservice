@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # Banco de Dados Relacional - SQL Server
+  # -------------------------------------------------------------
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: microshop-sqlserver
+    user: root 
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Pass@word123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql/data
+    networks:
+      - microshop-network
+
+  # -------------------------------------------------------------
+  # Mensageria - RabbitMQ (com Dashboard Web)
+  # -------------------------------------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: microshop-rabbitmq
+    hostname: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"   # Porta AMQP para comunicação entre microsserviços
+      - "15672:15672" # Porta HTTP para a interface gráfica Web
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - microshop-network
+
+# -------------------------------------------------------------
+# Redes e Volumes
+# -------------------------------------------------------------
+networks:
+  microshop-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+  rabbitmq_data:
+
+
+# -------------------------------------------------------------
+# Entendendo Networks e bridge
+# -------------------------------------------------------------
+## 1. Por que criamos uma rede customizada (networks: microshop-network) ? 
+
+# A declaração da rede no docker-compose.yml resolve dois grandes problemas em arquiteturas de contêineres:
+# 1.1 Resolução de Nomes Automática via DNS Interno (Service Discovery)
+# Em vez de precisar descobrir o endereço IP virtual dinâmico que o Docker atribui a cada contêiner (IPs que mudam toda vez que o contêiner reinicia), o Docker possui um servidor DNS interno.
+# Quando conectamos o sqlserver e o rabbitmq na mesma rede microshop-network:
+# - O contêiner da nossa futura API poderá se conectar ao banco usando simplesmente o nome do serviço como host: Server=sqlserver,1433;.
+# - Da mesma forma, para conectar no RabbitMQ, a API usará o nome HostName=rabbitmq.
+
+# 1.2 Isolamento e Segurança
+# Ao criar a microshop-network, criamos um perímetro de rede fechado. Apenas os contêineres declarados nessa rede conseguem "enxergar" e conversar entre si, 
+# isolando o tráfego da nossa aplicação de outros contêineres ou processos rodando no seu computador.
+
+## 2. O que é o driver bridge (driver: bridge)?
+# O bridge (ponte) é o driver de rede padrão do Docker para contêineres que rodam no mesmo servidor/host.
+# - Como ele funciona:
+# O Docker cria uma interface de rede virtual no seu sistema operacional (uma "ponte" de software). Todos os contêineres associados a essa rede são plugados virtualmente nessa mesma ponte.
+# - Comunicação Interna vs. Externa:
+# Internamente (dentro da ponte): Todos os contêineres conectados à microshop-network conversam livremente em qualquer porta.
+# Externamente (para a sua máquina): Para que você, no seu navegador ou na sua IDE, consiga acessar o RabbitMQ (localhost:15672), usamos o mapeamento de portas (ports: - "15672:15672"). 
+# O driver bridge intercepta a requisição da sua máquina real e a redireciona para dentro da ponte virtual até o contêiner.
+
+# Resumo Prático o que os dois fazem na prática?
+# networks -> Agrupa nossos microsserviços em uma mesma "sala virtual" para que se comuniquem pelo nome do serviço em vez de IP.
+# bridge -> Cria a ponte de rede interna que conecta os contêineres entre si e permite expor portas selecionadas para a sua máquina.
