@@ -1,9 +1,7 @@
 version: '3.8'
 
 services:
-  # -------------------------------------------------------------
   # Banco de Dados Relacional - SQL Server
-  # -------------------------------------------------------------
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: microshop-sqlserver
@@ -18,9 +16,7 @@ services:
     networks:
       - microshop-network
 
-  # -------------------------------------------------------------
   # Mensageria - RabbitMQ (com Dashboard Web)
-  # -------------------------------------------------------------
   rabbitmq:
     image: rabbitmq:3-management
     container_name: microshop-rabbitmq
@@ -36,9 +32,7 @@ services:
     networks:
       - microshop-network
 
-# -------------------------------------------------------------
 # Redes e Volumes
-# -------------------------------------------------------------
 networks:
   microshop-network:
     driver: bridge
@@ -48,9 +42,8 @@ volumes:
   rabbitmq_data:
 
 
-# -------------------------------------------------------------
-# Entendendo Networks e bridge
-# -------------------------------------------------------------
+# Entendendo Networks e bridge (Explicacao)
+
 ## 1. Por que criamos uma rede customizada (networks: microshop-network) ? 
 
 # A declaração da rede no docker-compose.yml resolve dois grandes problemas em arquiteturas de contêineres:
