@@ -3,5 +3,10 @@
     <File Path=".gitignore" />
     <File Path="docker-compose.yml" />
   </Folder>
-  <Folder Name="/Src/" />
+  <Folder Name="/Itens de Solução/Duvidas/">
+    <File Path="docker-compose.md" />
+  </Folder>
+  <Folder Name="/Src/">
+    <Project Path="Catalog.API/Catalog.API.csproj" Id="ef00d9ac-7641-4917-ab33-0ef424b01727" />
+  </Folder>
 </Solution>

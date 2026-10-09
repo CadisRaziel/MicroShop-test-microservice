@@ -1,0 +1,25 @@
+@HostAddress = http://localhost:5123
+
+### 1. Buscar todos os produtos do catálogo
+GET {{HostAddress}}/api/catalog/items
+Accept: application/json
+
+###
+
+### 2. Buscar produto por ID (Exemplo: ID 1)
+GET {{HostAddress}}/api/catalog/items/1
+Accept: application/json
+
+###
+
+### 3. Criar um novo produto no catálogo
+POST {{HostAddress}}/api/catalog/items
+Content-Type: application/json
+
+{
+  "name": "Teclado Mecânico RGB",
+  "description": "Teclado mecânico switch azul ideal para devs",
+  "price": 299.90,
+  "stockQuantity": 25
+}
+
